@@ -14,6 +14,8 @@ from src.data_store.order_data import OrderData
 from src.data_store.site_visit_data import SiteVisitDataStore
 from src.data_store.image_data import ImageData
 
+from src.util.date_util import DateUtil
+
 
 class EventMapper(object):
     '''
@@ -35,10 +37,12 @@ class EventMapper(object):
     def Ingest(self, e, D):
 
         event_name = e["type"]
-        self.logger.info(e)
+        if self.logger:
+            self.logger.info(e)
+            self.logger.debug(event_name)
         if(event_name in self.event_mapper):
             mapper_object = self.event_mapper[event_name][1]
-            self.logger.debug(event_name)
+
             val = mapper_object.map_to_model(e,
                                              self.event_mapper[event_name][0]()
                                              )
@@ -53,23 +57,33 @@ class EventMapper(object):
         site_visit_data = self.event_mapper["SITE_VISIT"][2].get_data(D)
 
         ltv_customer = []
+        date_utils = DateUtil()
+        weeks = date_utils.get_weeks(D.max_date, D.min_date)
+        # Calculating global weeks of data set
+        if weeks < 52 :
+            weeks = 52
+        else:
+            weeks = int(weeks)
 
         for customer_id in customer_data.keys():
-
+            # Checks whether customer_id for customer data set
+            # Has mapping orders data set and site_visit data set
             if customer_id in order_data and customer_id in site_visit_data:
 
                 total_amount = order_data[customer_id]["total_amount"]
                 total_visit = site_visit_data[customer_id]["site_visit"]
                 customer_expenditures_per_visit = float(total_amount) \
                     / float(total_visit)
-                number_of_site_visits_per_week = float(total_visit)/float(52)
+                number_of_site_visits_per_week = float(total_visit)/float(weeks)
 
                 a = customer_expenditures_per_visit * \
                     number_of_site_visits_per_week
 
                 ltv = 52 * a * self.t
-                self.logger.info("ltv value: " + str(ltv) + " customer id: "
-                                 + customer_id)
+
+                if self.logger:
+                    self.logger.info("ltv value: " + str(ltv) + " customer id: "
+                                     + customer_id)
                 heapq.heappush(ltv_customer, (ltv,  customer_id))
 
         customers = heapq.nlargest(x, ltv_customer)

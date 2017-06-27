@@ -47,7 +47,7 @@ class FileProcessor(object):
         try:
             with open(file_name, 'w') as f:
                 for d in data:
-                    print(d)
+
                     f.write(d+'\n')
 
         except Exception:

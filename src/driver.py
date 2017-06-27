@@ -40,6 +40,10 @@ class Driver:
             # Feeding event one by one to Ingest method
             event.Ingest(e, D)
         # Call for calculating top x customer based on LTV value
-        write_data = event.TopXSimpleLTVCustomers(int(args.topxltv), D)
+        if int(args.topxltv) > 0:
+            x = int(args.topxltv)
+        else:
+            x = 2
+        write_data = event.TopXSimpleLTVCustomers(x, D)
         # Write top x customers to the output file
         file_process.write_file(args.output, write_data)

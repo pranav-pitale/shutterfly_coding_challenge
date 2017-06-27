@@ -12,28 +12,26 @@ class SiteVisitDataStore(BaseDataStore):
         # Removing micro-seconds from event-time
         if '.' in event.event_time:
             event_time = event.event_time[:event.event_time.index('.')]
+            event_time = datetime.strptime(event_time, '%Y-%m-%dT%H:%M:%S')
+
+            if event_time < D.min_date:
+                D.min_date = event_time
+            else:
+                D.max_date = event_time
+
         site_vist_value = dict()
 
         if event.customer_id not in D.site_visit: # noqa
 
             site_vist_value["object"] = [event]
             site_vist_value["site_visit"] = 1
-            site_vist_value["min_date"] = datetime.strptime(
-                event_time, '%Y-%m-%dT%H:%M:%S')
-            site_vist_value["max_date"] = datetime.strptime(
-                event_time, '%Y-%m-%dT%H:%M:%S')
+
             D.site_visit[event.customer_id] = site_vist_value
         else:
             site_vist_value = D.site_visit[event.customer_id]
             objectList = site_vist_value['object']
             objectList.append(event)
             site_vist_value['site_visit'] += 1
-            event_time = datetime.strptime(event_time, '%Y-%m-%dT%H:%M:%S')
-
-            if event_time < site_vist_value['min_date']:
-                site_vist_value['min_date'] = event_time
-            else:
-                site_vist_value['max_date'] = event_time
 
             D.site_visit[event.customer_id] = site_vist_value
 

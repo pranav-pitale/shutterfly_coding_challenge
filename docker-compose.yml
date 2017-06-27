@@ -1,0 +1,11 @@
+version: '2'
+services:
+  shutterfly-assessment:
+    build: .
+    environment:
+      - ENV
+      - PORT=5001
+    ports:
+      - "5001:5001"
+    volumes:
+      - ".:/src/"

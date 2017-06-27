@@ -9,7 +9,7 @@ calculated from data structure
 '''
 def test_topx_ltv():
     f = FileProcessor()
-    data = f.read_file("../input/input.txt")
+    data = f.read_file("../input/test_input.txt")
     D = DataStore()
     ingest = EventMapper()
 

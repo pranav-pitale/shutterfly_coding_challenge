@@ -1,4 +1,5 @@
-Shutterfly assessment
+Shutterfly assessment:
+
 
 Classes and Pakages:
   
@@ -66,3 +67,4 @@ tests: It has test case
   - cd tests
   - pytest  
   - pytest --cov
+
